@@ -214,6 +214,30 @@ The purpose of this document is to define the latest Water Desk Credit App Aspir
 }
 ```
 
+
+
+5. [Credit Application: ]()
+
+
+  a) [Credit Application: Get Contract Info(New Customer Only)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1764995&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA)  
+
+  | Syntax | Description |
+  | ----------- | ----------- |
+  | Method | GET |
+  | Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/Contract/<%[Contract#]%>/record``` |
+  | Headers | ```Content-Type: application/json``` |
+
+  
+    b) [Credit Application: Get Credit Status Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1765488&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA#anchor_wfsubaction)
+  
+  | Syntax | Description |
+  | ----------- | ----------- |
+  | Method | GET |
+  | Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/contract/<%Trim(ToText(Format([Trans#])))%>/transaction``` |
+  | Headers | ```Content-Type: application/json``` |
+
+  
+
 #. [Credit Application: ]()
 
 | Syntax | Description |
