@@ -4,6 +4,23 @@ The purpose of this document is to define the latest Water Desk Credit App Aspir
 
 ## Steps
 
+
+### Full step-by-step walkthrough
+#### New customer flow
+1) Send Credit Application is clicked.
+2) TeamDesk logs start time and gets dealer info.
+3) **Step 1** creates customer in Aspire using [New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860) with ```POST /Account```.
+4) TeamDesk moves to Step 2 to create location.
+5) Step 3 assigns/sets primary location.
+6) **Step 4** creates the contract in Aspire with [Send Contract to Aspire(New Customer), Step 4](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=4970083) using ```POST /Contract```, setting status to **Dealer Submitted**.
+7) TeamDesk moves to Step 5 and later steps for contract info, assets, payment info, related accounts, billing-location variants, etc.
+8) Status is checked later manually or by periodic triggers.
+9) Aspire returns approval/decline; TeamDesk stores it in [CreditDecision](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830791) / [ContractStatus](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830792).
+
+#### Existing customer flow
+Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbtn.aspx?custbtn=796632) instead of creating a new customer first.
+
+
 1. [Credit Application: New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKz4ErBrhSiEsazNbSwNLMwM0BXnVxaXJJUAlUM5dhaGhtYGJkBAA)
 
 | Syntax | Description |
@@ -236,7 +253,81 @@ The purpose of this document is to define the latest Water Desk Credit App Aspir
   | Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/contract/<%Trim(ToText(Format([Trans#])))%>/transaction``` |
   | Headers | ```Content-Type: application/json``` |
 
-  
+#. [Credit Application: ]()
+
+| Syntax | Description |
+| ----------- | ----------- |
+| Method | POST |
+| Url | ``` ``` |
+| Headers | ```Content-Type: application/json``` |
+| Body | see JSON below |
+
+```json
+
+```
+
+
+8. [Credit Application: Send the Payment Information(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897499)
+
+| Syntax | Description |
+| ----------- | ----------- |
+| Method | PUT |
+| Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/Contract``` |
+| Headers | ```Content-Type: application/json``` |
+| Body | see JSON below |
+
+```json
+{
+"FinanceCompanyRecordId": {"Type": "Record", "value": <%= If([Country] = 'Canada', 10002, 10001) %> },
+"CustomerRecordID": {"value": "<%If([Mavis Account Override]=True,[Mavis Account Override ID],[Customer Account#])%>","type": "Record"},
+"RecordId": {"value": "<%[Contract#]%>","type":"Record"},
+"ContractStatus": {"Status":"Dealer Submitted"},
+"Term": "<%[Term(New)]%>",
+"StartDate": "<%ToText([Close Date])%>",
+"OriginalCost": "<%ToText([Potential Funding])%>",
+"Lease": {
+"Payments": [
+  {
+  "StartDate": "<%If([Billing Freq(New)]="Quarterly",ToText(AdjustMonth([Close Date],3)), [Billing Freq(New)]="SemiAnnual",ToText(AdjustMonth([Close Date],6)),
+                    [Billing Freq(New)]="Annual",ToText(AdjustMonth([Close Date],12)),ToText(AdjustMonth([Close Date],1)))%>",
+  "Occurrences": "<%Left(ToText([No of Payments]),".")%>",
+  "Frequency": "<%[Billing Freq(New)]%>",
+  "Amount": "<%If([Billing Freq(New)]="Quarterly",ToText([Total_Monthly_Payment_Amount]*3), [Billing Freq(New)]="SemiAnnual",ToText([Total_Monthly_Payment_Amount]*6),
+                  [Billing Freq(New)]="Annual",ToText([Total_Monthly_Payment_Amount]*12),ToText([Total_Monthly_Payment_Amount]))%>",
+  "PaymentType": "Standard"
+      }
+
+    ]
+  }
+}
+```
+
+
+
+9. [Credit Application: Move Asset to Contract(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1888760)
+
+| Syntax | Description |
+| ----------- | ----------- |
+| Method | PUT |
+| Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/contract/<%[CA-ContractID]%>/record/asset``` |
+| Headers | ```Content-Type: application/json``` |
+| Body | see JSON below |
+
+```json
+[
+{
+"IsPrimary":true,
+"RecordId": {
+        "Value": "<%[Asset ID]%>",
+        "Type": "Record"
+      },
+"LocationId":"<%If([Mavis Account Override]=True,[Mavis Account Override ID],[Customer Account#])%>",
+"BillToLocationId":"<%If([Use Customer Address]=false,[BilltoLoc],[Mavis Account Override]=True,[Mavis Account Override ID],[Customer Account#])%>"
+}
+]
+```
+
+
 
 #. [Credit Application: ]()
 
