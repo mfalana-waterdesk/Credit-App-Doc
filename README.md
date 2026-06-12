@@ -25,13 +25,13 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 ## 1.  [Credit Application: New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKz4ErBrhSiEsazNbSwNLMwM0BXnVxaXJJUAlUM5dhaGhtYGJkBAA)
 
 
-****Description:**** We send the customer’s business information to Aspire so the customer exists in their system.
+**Description:** We send the customer’s business information to Aspire so the customer exists in their system.
 
-****Why this step exists:**** Aspire cannot process the credit application until the customer account has been created.
+**Why this step exists:** Aspire cannot process the credit application until the customer account has been created.
 
-****What TeamDesk does:**** TeamDesk sends the company’s legal name, EIN, contact information, and customer record ID to Aspire and creates the customer as a business account.
+**What TeamDesk does:** TeamDesk sends the company’s legal name, EIN, contact information, and customer record ID to Aspire and creates the customer as a business account.
 
-****Result:**** A customer account is created in Aspire and is ready to be used for the rest of the credit application process.
+**Result:** A customer account is created in Aspire and is ready to be used for the rest of the credit application process.
 
 
 
@@ -74,13 +74,13 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 2. [Credit Application: Create Location(New Customer) Step 2](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896861&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA)
 
-****Description:**** We send the customer’s main address to Aspire so the customer has a location on file.
+**Description:** We send the customer’s main address to Aspire so the customer has a location on file.
 
-****Why this step exists:**** Aspire needs an address/location for the customer before the contract can be completed correctly.
+**Why this step exists:** Aspire needs an address/location for the customer before the contract can be completed correctly.
 
-****What TeamDesk does:**** TeamDesk sends the customer’s main address, city, state, country, postal code, contact name, email, phone number, and tax-exempt status to Aspire as the primary location.
+**What TeamDesk does:** TeamDesk sends the customer’s main address, city, state, country, postal code, contact name, email, phone number, and tax-exempt status to Aspire as the primary location.
 
-****Result:**** A primary customer location is created in Aspire and linked to the customer account.
+**Result:** A primary customer location is created in Aspire and linked to the customer account.
 
 | Syntax | Description |
 | ----------- | ----------- |
@@ -127,7 +127,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 3. [Credit Application: Set Primary Location(New Customer) Step 3](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896864&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA)
 
-**Plain English:** We tell Aspire which location should be treated as the customer’s main location.
+**Description:** We tell Aspire which location should be treated as the customer’s main location.
 
 **Why this step exists:** Even after the address is created, the customer account still needs to be pointed to that location as its primary location.
 
@@ -154,7 +154,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 4. [Credit Application: Send Contract to Aspire(New Customer) Step 4](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=4970083&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA)
 
-**Plain English:** We create the credit application in Aspire as a contract and submit it for review.
+**Description:** We create the credit application in Aspire as a contract and submit it for review.
 
 **Why this step exists:** This is the actual submission of the credit application to Aspire.
 
@@ -271,7 +271,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 5. [Credit Application: ]()
 
-**Plain English:** We ask Aspire for the contract details so TeamDesk can store important information from the submitted application.
+**Description:** We ask Aspire for the contract details so TeamDesk can store important information from the submitted application.
 
 **Why this step exists:** Later steps depend on values that only Aspire can provide after the contract has been created, especially the transaction number.
 
@@ -299,7 +299,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 6. [Credit Application: ]()
 
-**Plain English:** We send the main piece of equipment or unit to Aspire and attach it to the contract.
+**Description:** We send the main piece of equipment or unit to Aspire and attach it to the contract.
 
 **Why this step exists:** Aspire needs to know what asset or equipment is part of the financing agreement.
 
@@ -310,18 +310,39 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 | Syntax | Description |
 | ----------- | ----------- |
 | Method | POST |
-| Url | ``` ``` |
+| Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/asset``` |
 | Headers | ```Content-Type: application/json``` |
 | Body | see JSON below |
 
 ```json
-
+[
+{
+"Action": "6",
+"Description": "<%[Description]%>",
+"ContractAssetId" :"<%[Asset Code]%>",
+"ContractIdentifier":"<%ToText(Format([Trans#]))%>",
+    "IsPrimary":true, "IsNew": true, "SerialNumbers":["<%[Asset SerialNo]%>"],
+    "Model":"<%[Description]%>",
+    "IsSoftCost": false,
+    "Locationid":"<%[AssetLoc_id]%>",
+    "LocationEntityRecordId": {"Type": "Record","value": "<%If([Mavis Account Override]=True,[Mavis Account Override ID],[Assetloc_id])%>"},
+    "BillToLocationRecordId": {"Type": "Record","value": "<%If([Use Customer Address]=false,[BilltoLoc],[Mavis Account Override]=True,[Mavis Account Override ID],[Assetloc_id])%>"},
+    "OriginalCost": "<%ToText([Asset_Funding])%>",
+    "VendorRecordId": {
+            "Type": "Id",
+            "Value": "<%[Distributor Account#]%>"},
+    "Quantity": "<%Left(ToText([Asset Qty]),".")%>",
+    "RecordId":"<%ToText([Asset Id])%>",
+    "AssetType": { "Code": "<%[Asset Code]%>", "Description": "<%[Description]%>"
+    }
+}
+]
 ```
 
 
 ## 7. [Credit Application: ]()
 
-**Plain English:** We connect the asset more fully to the contract record inside Aspire.
+**Description:** We connect the asset more fully to the contract record inside Aspire.
 
 **Why this step exists:** After the asset is created, Aspire may need an additional linking step so the asset is properly tied to the contract structure.
 
@@ -342,7 +363,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 8. [Credit Application: Send the Payment Information(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897499)
 
-**Plain English:** We tell Aspire how the customer will pay for the contract.
+**Description:** We tell Aspire how the customer will pay for the contract.
 
 **Why this step exists:** The contract is not financially complete until the payment schedule and amounts are defined.
 
@@ -387,7 +408,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 9. [Credit Application: Move Asset to Contract(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1888760)
 
-**Plain English:** We connect the asset to the correct contract location and billing location in Aspire.
+**Description:** We connect the asset to the correct contract location and billing location in Aspire.
 
 **Why this step exists:** The asset needs to point to the right customer/service location and, if applicable, the right bill-to location.
 
