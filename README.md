@@ -22,8 +22,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ---
 
-## 1.  [Credit Application: New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860)
-
+## 1.  [New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860)
 
 **Description:** We send the customer’s business information to Aspire so the customer exists in their system.
 
@@ -72,7 +71,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 
 
-## 2. [Credit Application: Create Location(New Customer) Step 2](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896861)
+## 2. [Create Location(New Customer) Step 2](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896861)
 
 **Description:** We send the customer’s main address to Aspire so the customer has a location on file.
 
@@ -125,7 +124,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 
 
-## 3. [Credit Application: Set Primary Location(New Customer) Step 3](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896864)
+## 3. [Set Primary Location(New Customer) Step 3](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896864)
 
 **Description:** We tell Aspire which location should be treated as the customer’s main location.
 
@@ -152,7 +151,9 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 }
 ```
 
-## 4. [Credit Application: Send Contract to Aspire(New Customer) Step 4](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=4970083)
+
+
+## 4. [Send Contract to Aspire(New Customer) Step 4](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=4970083)
 
 **Description:** We create the credit application in Aspire as a contract and submit it for review.
 
@@ -269,7 +270,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 
 
-5. [Credit Application: ]()
+## 5. [Credit Application: ]()
 
 **Description:** We ask Aspire for the contract details so TeamDesk can store important information from the submitted application.
 
@@ -280,7 +281,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 **Result:** TeamDesk now has the contract details it needs to continue the process and track the application.
 
 
-  a) [Credit Application: Get Contract Info(New Customer Only)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1764995)  
+  ### a) [Get Contract Info(New Customer Only)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1764995)  
 
   | Syntax | Description |
   | ----------- | ----------- |
@@ -289,7 +290,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
   | Headers | ```Content-Type: application/json``` |
 
   
-    b) [Credit Application: Get Credit Status Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1765488&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA#anchor_wfsubaction)
+  ### b) [Get Credit Status Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1765488)
   
   | Syntax | Description |
   | ----------- | ----------- |
@@ -297,7 +298,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
   | Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/contract/<%Trim(ToText(Format([Trans#])))%>/transaction``` |
   | Headers | ```Content-Type: application/json``` |
 
-## 6. [Credit Application: Attach the Assets for Equipment(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897497)
+## 6. [Attach the Assets for Equipment(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897497)
 
 **Description:** We send the main piece of equipment or unit to Aspire and attach it to the contract.
 
@@ -340,7 +341,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 ```
 
 
-## 7. [Credit Application: ]()
+## 7. [Tie Assets for the Multi Select(Primary) _Post](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2238697)
 
 **Description:** We connect the asset more fully to the contract record inside Aspire.
 
@@ -353,15 +354,29 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 | Syntax | Description |
 | ----------- | ----------- |
 | Method | POST |
-| Url | ``` ``` |
+| Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/contract/<%ToText(Format([Trans#]))%>/transaction/assets``` |
 | Headers | ```Content-Type: application/json``` |
 | Body | see JSON below |
 
 ```json
-
+[
+{
+"Condition": "New",
+"IsPrimary":true,
+"ContractAssetId": {"Type": "Record","value": "<%[Asset Id]%>"},
+"IsSoftCost": false,
+"ListPrice": "<%ToText([Actual Funding Amount])%>",
+"RecordId": "<%[Asset Id]%>",
+"UnitAmount": "<%ToText([Actual Funding Amount])%>",
+"OriginalCost": "<%ToText([Actual Funding Amount])%>",
+"CarryingCost": "<%ToText([Actual Funding Amount])%>",
+"FairMarketValue" : "<%ToText([Actual Funding Amount])%>",
+"InstallationDate":"<%ToText([Close Date])%>"
+}
+]
 ```
 
-## 8. [Credit Application: Send the Payment Information(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897499)
+## 8. [Send the Payment Information(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897499)
 
 **Description:** We tell Aspire how the customer will pay for the contract.
 
@@ -406,7 +421,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 
 
-## 9. [Credit Application: Move Asset to Contract(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1888760)
+## 9. [Move Asset to Contract(Primary)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1888760)
 
 **Description:** We connect the asset to the correct contract location and billing location in Aspire.
 
