@@ -25,7 +25,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 ## 1.  [Credit Application: New Customer Account(Step 1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896860&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKz4ErBrhSiEsazNbSwNLMwM0BXnVxaXJJUAlUM5dhaGhtYGJkBAA)
 
 
-****Plain English:**** We send the customer’s business information to Aspire so the customer exists in their system.
+****Description:**** We send the customer’s business information to Aspire so the customer exists in their system.
 
 ****Why this step exists:**** Aspire cannot process the credit application until the customer account has been created.
 
@@ -74,7 +74,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 2. [Credit Application: Create Location(New Customer) Step 2](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1896861&back=~v2~S0nSNzczMbHUL04tKS3QL09LTC7JzM8r1kssLqiwL0lMykm1tTQyNTKzAAA)
 
-****Plain English:**** We send the customer’s main address to Aspire so the customer has a location on file.
+****Description:**** We send the customer’s main address to Aspire so the customer has a location on file.
 
 ****Why this step exists:**** Aspire needs an address/location for the customer before the contract can be completed correctly.
 
