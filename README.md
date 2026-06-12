@@ -477,12 +477,12 @@ The Credit Application process does not end when the user clicks **Send Credit A
 
 TeamDesk supports this trigger-driven automation pattern with record change and periodic triggers, plus linked workflow actions such as Call URL, Update Record, Create Record, and Delete Record
 
-1. [Update ContractStatus From Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wftrigger.aspx?wftrigger=2827983)
+## 1. [Update ContractStatus From Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wftrigger.aspx?wftrigger=2827983)
 
-**Purpose:** This periodic trigger keeps TeamDesk’s contract status aligned with Aspire after the application has already been submitted.
+**Purpose:** This trigger keeps TeamDesk’s contract status aligned with Aspire after the application has already been submitted.
 
 **When it runs:**
-  * **Type:** Periodic Trigger
+  * **Type:** Periodic
   * **Schedule:** Daily at **3:00 AM**
 
 **Which records it checks:**
@@ -499,12 +499,52 @@ The trigger runs:
 
 This trigger is specifically used to ask Aspire for current status information and refresh TeamDesk fields when Aspire has newer contract status than what TeamDesk currently shows.
 
-**Result:**
+**Why this matters:** This is one of the main ways the database stays synchronized after the original booking flow finishes. It confirms that Aspire remains the source of truth for later contract status changes.
 
-If Aspire’s contract status has changed, TeamDesk updates the local Credit Application record to reflect Aspire’s latest contract/decision information.
+**Result:** If Aspire’s contract status has changed, TeamDesk updates the local Credit Application record to reflect Aspire’s latest contract/decision information.
 
-**Why this matters:**
+## 2. [Term Change(Equipment Asset Only)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wftrigger.aspx?wftrigger=1216644)
+**Purpose:** This trigger reruns rating, funding, and payment logic when the contract term or billing frequency changes on a submitted application that only has the main Equipment asset.
 
-This is one of the main ways the database stays synchronized after the original booking flow finishes. It confirms that Aspire remains the source of truth for later contract status changes.
+**When it runs:**
+  * **Type:** Record Change
+  * **Runs when record is:** Modified
+
+**Which records it checks:**
+
+This trigger only applies when:
+  * [Credit Application Status](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830789) is ```"Submitted"```
+  * [Description](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30847717) is ```"Equipment"```
+
+    
+**What fires trigger:**
+The trigger runs when any of these values change:
+  * [Billing Freq(New)](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830795)
+  * [Billing frequency](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830850)
+  * [Term(New)](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830834)
+
+**What TeamDesk does:**
+This trigger runs the following actions in sequence:
+  1. [Remove the Rate Sheet](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1764996)
+  Deletes the current rate information so it can be rebuilt.
+  2. [Get the Rate](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1765485)
+  Re-queries the Rate Sheet data for the updated term/frequency combination.
+  3. [Update the Funding Information on the Asset](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1764998)
+  Updates funding values on the asset based on the new rate.
+  4. [Update the Rate Sheet Step(1)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1765489)
+  Updates the selected rate usage flags.
+  5. [Asset TermChange](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2037268)
+  Updates attached asset term-change values.
+  6. [Update the Funding Information (Term Change)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2037269)
+  Recalculates asset funding for the new term.
+  7. [Send the Payment Information(Primary), Step 8](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=1897499)
+  Re-sends the payment stream to Aspire using the current term and billing frequency.
+  8. [Term Change(Equipment Only)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2118678)
+  Navigates into the next related term-change step.
+
+**Why this matters:** This trigger proves that Step 8 is not only part of the original booking flow. In this database, it is also the core payment update mechanism for post-submission term changes.
+
+**Result:** When the term or billing frequency changes after submission, TeamDesk clears and rebuilds the rate/funding values and then pushes the updated payment stream back to Aspire.
+
 
 ## Attaching Units
