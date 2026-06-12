@@ -136,7 +136,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 | Syntax | Description |
 | ----------- | ----------- |
-| Method | POST |
+| Method | PUT |
 | Url | ```https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/Account``` |
 | Headers | ```Content-Type: application/json``` |
 | Body | see JSON below |
@@ -270,7 +270,7 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 
 
-## 5. [Credit Application: ]()
+## 5. [Credit Application: ggg ](https://<%[Aspire Http Link]%>.leaseteam.net/LeaseTeam.Aspire.Api/1/Contract/<%[Contract#]%>/record)
 
 **Description:** We ask Aspire for the contract details so TeamDesk can store important information from the submitted application.
 
@@ -343,13 +343,13 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 
 ## 7. [Tie Assets for the Multi Select(Primary) _Post](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2238697)
 
-**Description:** We connect the asset more fully to the contract record inside Aspire.
+**Description:** We add the asset into the Aspire contract transaction so Aspire treats it as a financed contract item.
 
-**Why this step exists:** After the asset is created, Aspire may need an additional linking step so the asset is properly tied to the contract structure.
+**Why this step exists:** Creating the asset alone is not enough; the asset must also be attached to the contract transaction structure.
 
-**What TeamDesk does:** TeamDesk runs the next contract/asset linking step so Aspire treats the asset as part of the contract’s financed items.
+**What TeamDesk does:** TeamDesk posts the primary asset into the Aspire contract transaction using the transaction number returned from earlier contract steps.
 
-**Result:** The asset is tied into the contract record and is ready for payment and location updates.
+**Result:** The asset becomes part of the contract transaction in Aspire and is ready for final location and payment handling.
 
 | Syntax | Description |
 | ----------- | ----------- |
@@ -468,5 +468,43 @@ Uses [Send Contract](https://waterdesk.teamdesk.net/secure/db/76449/setup/custbt
 ```
 
 ## Record Change Triggers
+
+The Credit Application process does not end when the user clicks **Send Credit Application**. After the initial booking flow, TeamDesk uses workflow triggers to keep the Aspire contract synchronized when status, billing, or term-related values change. These triggers support three important follow-up scenarios in the current database:
+
+1. Status sync from Aspire back into TeamDesk
+2. Recalculating and resending payment information after a term or billing change
+3. Creating and applying a separate billing location after submission/approval
+
+TeamDesk supports this trigger-driven automation pattern with record change and periodic triggers, plus linked workflow actions such as Call URL, Update Record, Create Record, and Delete Record
+
+1. [Update ContractStatus From Aspire](https://waterdesk.teamdesk.net/secure/db/76449/setup/wftrigger.aspx?wftrigger=2827983)
+
+**Purpose:** This periodic trigger keeps TeamDesk’s contract status aligned with Aspire after the application has already been submitted.
+
+**When it runs:**
+  * **Type:** Periodic Trigger
+  * **Schedule:** Daily at **3:00 AM**
+
+**Which records it checks:**
+
+This trigger processes Credit Application records where:
+  * [ContractStatus](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830792) is not ```"Booked"```
+  * [Date Created](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830786) is within the last 90 days
+  * [ContractStatus](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830792) is different from [Status From Contract Tab](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=71765311)
+
+What TeamDesk does:
+
+The trigger runs:
+  * [Get Credit Status Aspire(Step 5.2, slim)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=5353402)
+
+This trigger is specifically used to ask Aspire for current status information and refresh TeamDesk fields when Aspire has newer contract status than what TeamDesk currently shows.
+
+**Result:**
+
+If Aspire’s contract status has changed, TeamDesk updates the local Credit Application record to reflect Aspire’s latest contract/decision information.
+
+**Why this matters:**
+
+This is one of the main ways the database stays synchronized after the original booking flow finishes. It confirms that Aspire remains the source of truth for later contract status changes.
 
 ## Attaching Units
