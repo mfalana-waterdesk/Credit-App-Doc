@@ -547,4 +547,46 @@ This trigger runs the following actions in sequence:
 **Result:** When the term or billing frequency changes after submission, TeamDesk clears and rebuilds the rate/funding values and then pushes the updated payment stream back to Aspire.
 
 
+## 3. [Create Billing Location](https://waterdesk.teamdesk.net/secure/db/76449/setup/wftrigger.aspx?wftrigger=1710404)
+**Purpose:** This trigger creates and applies a separate billing location in Aspire after submission or approval when the billing address is different from the customer’s main address.
+
+**When it runs:**
+  * **Type:** Record Change
+  * **Runs when record is:** Modified
+
+**Which records it checks:**
+This trigger applies when:
+  * [Bulk Load Units](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=43648599) = ```"No"```
+  * [Use Customer Address](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30847779) = ```false```
+  * and [ContractStatus](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830792) is one of:
+    * ```"Dealer Submitted"```
+    * ```"Approved by PWP (A)"```
+    * ```"Approved by PWP (B)"```
+    * ```"Approved by PWP (Recourse)"```
+
+
+**What fires trigger:**
+The trigger runs when any of these values change:
+  * [B-Street 1](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830844)
+  * [B-City](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30830846)
+  * [Use Customer Address](https://waterdesk.teamdesk.net/secure/db/76449/setup/column.aspx?column=30847779)
+
+
+**What TeamDesk does:**
+This trigger runs the following actions:
+  1. [Create Location(Bill To Location)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2365187)
+  Creates a separate bill-to location in Aspire.
+  2. [Update the Contract for Bill to](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=2365190)
+  Updates the Aspire contract so it uses the new bill-to location.
+  3. [Update Payment Stream(BillToChange)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=3051165)
+  Re-sends the payment stream while preserving contract status.
+  4. [Update Units Billto (Attach Units)](https://waterdesk.teamdesk.net/secure/db/76449/setup/wfaction.aspx?wfaction=3051162)
+  Updates attached-unit records so their bill-to references match the new billing location.
+
+**Why this matters:** This is the clearest confirmed bridge between the Credit Application table and attached-unit logic. Even though I could not fully inspect the separate Attach Units table setup pages, this trigger confirms that attached units are part of the bill-to synchronization process.
+
+**Result:** When a separate billing address is used after submission/approval, TeamDesk creates the bill-to location in Aspire, updates the contract to use it, refreshes the payment stream, and updates attached-unit bill-to values.
+
+
+
 ## Attaching Units
